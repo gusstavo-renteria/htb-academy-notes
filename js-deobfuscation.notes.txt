@@ -1,0 +1,45 @@
+* Desofuscación javascript
+
+  La desobuscación de código es una habilidad importante para aprender si queremos ser expertos en análisis de código
+  e ingeniería inversa. A menudo nos encontramos con un código ofuscado que quiere ocultar ciertas funcionalidades,
+  como el malware que utiliza código JavaScript ofuscado para recuperar su carga útil principal.
+
+  ¿Qué es la ofuscación?
+    La ofuscación es una técnica utilizada para hacer que un script sea más difícil de leer por humanos, pero le
+    permite funcionar de la misma manera desde un punto de vista técnico, aunque el rendimiento puede ser más lento.
+    Esto generalmente se logra automáticamente mediante el uso de una herramienta de ofuscación, que toma el código
+    como entrada, e intenta reescribir el código de una manera mucho más difícil de leer, dependiendo de su diseño.
+
+//
+
+-Decodificación
+  
+  #base64
+  La codificación generalmente se usa para reducir el uso de caracteres especiales, como cualquier carácter codificado
+  en base64 estaría representado en caracteres alfanuméricos, además de + y / solamente. Independientemente de la
+  entrada, incluso si está en formato binario, la cadena codificada base64 resultante solo los usaría.
+    
+    ?Codificar
+    $ echo hola_mundo | base64
+
+    ?Decodificar
+    $ echo aG9sYV9tdW5kbwo= | base64 -d
+
+  #hex
+  Codifica cada carácter en su hex orden en el ASCII mesa. Por ejemplo, a es 61 en hexágono, b es 62, c es 63, y así.
+    
+    ?Codificar
+    $ echo hola_mundo | xxd -p
+
+    ?Decodificar
+    $ echo 686f6c615f6d756e646f0a | xxd -p -r
+
+  #rot13
+    
+    ?Codificar
+    $ echo hola_mundo | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+    ?Decodificar
+    $ echo ubyn_zhaqb | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+

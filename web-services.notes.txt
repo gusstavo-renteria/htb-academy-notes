@@ -1,0 +1,367 @@
+* Solicitudes WEB
+
+
+-Protocolo de transferencia de hipertexto ( HTTP )
+
+  HTTP es un protocolo de nivel de aplicación utilizado para acceder a los recursos de la World Wide Web. El
+  término hypertext significa texto que contiene enlaces a otros recursos y texto que los lectores pueden
+  interpretar fácilmente.
+  
+  La comunicación HTTP consiste en un cliente y un servidor, donde el cliente solicita un recurso al servidor.
+  El servidor procesa las solicitudes y devuelve el recurso solicitado. El puerto predeterminado para la 
+  comunicación HTTP es el puerto 80, aunque esto se puede cambiar a cualquier otro puerto, dependiendo de la
+  configuración del servidor web. 
+
+//
+
+-URL
+
+  http://admin:passwd@wwux.com:80/dashboard.php?login=true#status
+
+  #Scheme	http:// https://
+    Esto se utiliza para identificar el protocolo al que accede el cliente y termina con dos puntos y una barra
+    doble (://)
+  
+  #User Info	admin:password@
+    Este es un componente opcional que contiene las credenciales (separadas por dos puntos :) se usa para
+    autenticarse en el host, y se separa del host con un arroba(@)
+  
+  #Host	inlanefreight.com
+    El host significa la ubicación del recurso. Esto puede ser un nombre de host o una dirección IP
+  
+  #Port	:80
+    El puerto está separado del Host por dos puntos (:). Si no se especifica ningún puerto, http usa por defecto
+    al puerto 80 y https predeterminado a puerto 443
+  
+  #Path	/dashboard.php
+    Esto apunta al recurso al que se accede, que puede ser un archivo o una carpeta. Si no se especifica ninguna
+    ruta, el servidor devuelve el índice predeterminado ( p. index.html).
+  
+  #Query String	?login=true
+    La cadena de consulta comienza con un signo de interrogación (?), y consta de un parámetro (login) y un
+    valor (true). Múltiples parámetros pueden estar separados por un ampersand (&).
+  
+  #Fragments	#status
+    Los navegadores procesan los fragmentos en el lado del cliente para ubicar secciones dentro del recurso
+    primario ( p. un encabezado o sección en la página ).
+
+//
+
+-cURL
+
+  cURL ( URL del cliente ) es una herramienta y biblioteca de línea de comandos que admite principalmente
+  HTTP junto con muchos otros protocolos. Esto lo convierte en un buen candidato para los scripts y la
+  automatización, por lo que es esencial para enviar varios tipos de solicitudes web desde la línea de
+  comandos, que es necesario para muchos tipos de pruebas de penetración web.
+  
+  ?Podemos enviar una solicitud HTTP básica a cualquier URL usándola como argumento para cURL, de la
+  siguiente manera:
+  
+  $ curl wwux.com
+  
+  
+  ?También podemos usar cURL para descargar una página o un archivo y generar el contenido en un archivo
+  usando el -O bandera:
+  
+  $ curl -O wwux.com
+  
+  
+  ?Podemos silenciar el estado con el -s bandera, como sigue:
+  
+  $ curl -s -O wwux.com
+  
+  
+  ?Para omitir la verificación del certificado con cURL, podemos usar el -k bandera:
+
+  $ curl -k wwux.com
+
+
+  ?Para proporcionar las credenciales a través de cURL, podemos usar la bandera -u:
+
+  $ curl -u admin:root http://wwux.com
+  $ curl http://admin:root@wwux.com
+
+
+  ?Podemos configurar el encabezado con la bandera -H:
+
+  $ curl -H 'Authorization: Basic YWRtaW46YWRtaW4=' http://wwux.com
+  
+  ?Podemos establecer la cookie con la bandera -b en cURL
+  
+  $ curl -b 'PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1' http://wwux.com
+
+//
+
+-Protocolo de transferencia de hipertexto seguro ( HTTPS )
+
+  Uno de los inconvenientes significativos de HTTP es que todos los datos se transfieren en texto claro.
+  Esto significa que cualquier persona entre la fuente y el destino puede realizar un ataque de Hombre en
+  el medio ( MiTM ) para ver los datos transferidos.
+  
+  Para contrarrestar este problema, el Protocolo HTTPS ( HTTP Secure ) fue creado, en el que todas las
+  comunicaciones se transfieren en formato cifrado, por lo que incluso si un tercero intercepta la
+  solicitud, no podrían extraer los datos de él. Por esta razón, HTTPS se ha convertido en el esquema
+  principal para sitios web en Internet, y HTTP se está eliminando gradualmente, y pronto la mayoría de
+  los navegadores web no permitirán visitar sitios web HTTP.
+
+//
+
+-Solicitudes y respuestas HTTP
+
+  Las comunicaciones HTTP consisten principalmente en una solicitud HTTP y una respuesta HTTP. El cliente
+  hace una solicitud HTTP ( p. cURL / navegador ), y es procesado por el servidor ( p. servidor web ).
+  Las solicitudes contienen todos los detalles que requerimos del servidor, incluido el recurso
+  (, p. URL, ruta, parámetros ), cualquier información de solicitud, encabezados u opciones que
+  especifiquemos.
+  
+  Una vez que el servidor recibe la solicitud HTTP, la procesa y responde enviando la respuesta HTTP, que
+  contiene el código de respuesta y puede contener los datos de recursos si el solicitante tiene acceso a
+  ellos.
+  
+  ?Para ver la solicitud y respuesta HTTP completa, simplemente podemos agregar la bandera -v a
+  nuestros comandos anteriores, y debe imprimir tanto la solicitud como la respuesta:
+  
+  $ curl wwux.com -v
+  
+  
+  ?La bandera -vvv muestra una salida aún más detallada.
+  
+  $ curl wwux.com -vvv
+  
+//
+
+-Encabezados HTTP
+
+  Los encabezados HTTP pasan información entre el cliente y el servidor. Algunos encabezados solo se usan
+  con solicitudes o respuestas, mientras que otros encabezados generales son comunes a ambos.
+  
+  ?Podemos dividir los encabezados en las siguientes categorías:
+  
+  #General Headers
+  Se utilizan tanto en solicitudes HTTP como en respuestas. Son contextuales y están acostumbrados a
+  'describe the message rather than its contents'.
+  
+  ~~~
+    Date	Date: Wed, 16 Feb 2022 10:38:44 GMT
+    Tiene la fecha y hora en que se originó el mensaje. Se prefiere convertir el tiempo al estándar UTC zona
+    horaria.
+    
+    Connection	Connection: close
+    Dicta si la conexión de red actual debe mantenerse viva después de que finalice la solicitud. Dos
+    valores comúnmente utilizados para este encabezado son close y keep-alive. los close el valor del
+    cliente o del servidor significa que les gustaría finalizar la conexión, mientras que el keep-alive el
+    encabezado indica que la conexión debe permanecer abierta para recibir más datos e información.
+  ~~~
+  #
+  
+  #Entity Headers
+  puede ser 'common to both the request and response'. Estos encabezados están acostumbrados a
+  'describe the content' ( entidad ) transferida por un mensaje. Por lo general, se encuentran en las
+  respuestas y solicitudes POST o PUT.
+  
+  ~~~
+    Content-Type	Content-Type: text/html
+    Se utiliza para describir el tipo de recurso que se transfiere. Los navegadores agregan automáticamente
+    el valor en el lado del cliente y lo devuelven en la respuesta del servidor. los charset el campo denota
+    el estándar de codificación, como UTF-8.
+    
+    Media-Type	Media-Type: application/pdf
+    Los media-type es similar a Content-Type, y describe los datos que se transfieren. Este encabezado puede
+    desempeñar un papel crucial para que el servidor interprete nuestra entrada. los charset el campo
+    también se puede usar con este encabezado.
+    
+    Boundary	boundary="b4e4fbd93540"
+    Actúa como creador para separar el contenido cuando hay más de uno en el mismo mensaje. Por ejemplo,
+    dentro de los datos de un formulario, este límite se usa como --b4e4fbd93540 para separar diferentes
+    partes del formulario.
+    
+    Content-Length	Content-Length: 385
+    Tiene el tamaño de la entidad que se está pasando. Este encabezado es necesario ya que el servidor lo
+    usa para leer datos del cuerpo del mensaje, y es generado automáticamente por el navegador y herramientas
+    como cURL.
+    
+    Content-Encoding	Content-Encoding: gzip
+    Los datos pueden sufrir múltiples transformaciones antes de pasarlos. Por ejemplo, se pueden comprimir
+    grandes cantidades de datos para reducir el tamaño del mensaje. El tipo de codificación que se utiliza
+    debe especificarse utilizando el Content-Encoding cabezazo.
+  ~~~
+  #
+  
+  #Request Headers
+  El cliente envía Encabezados de solicitud en una transacción HTTP. Estos encabezados son 'used in an HTTP
+  request and do not relate to the content' del mensaje. Los siguientes encabezados se ven comúnmente en
+  las solicitudes HTTP.
+  
+  ~~~
+    Host	Host: www.inlanefreight.com
+    Se utiliza para especificar el host que se está consultando para el recurso. Puede ser un nombre de
+    dominio o una dirección IP. Los servidores HTTP se pueden configurar para alojar diferentes sitios
+    web, que se revelan en función del nombre de host. Esto hace que el encabezado del host sea un
+    objetivo de enumeración importante, ya que puede indicar la existencia de otros hosts en el servidor
+    de destino.
+
+    User-Agent	User-Agent: curl/7.77.0
+    Los User-Agent el encabezado se utiliza para describir al cliente que solicita recursos. Este
+    encabezado puede revelar mucho sobre el cliente, como el navegador, su versión y el sistema operativo.
+
+    Referer	Referer: http://www.inlanefreight.com/
+    Denota de dónde proviene la solicitud actual. Por ejemplo, hacer clic en un enlace de los resultados
+    de búsqueda de Google haría https://google.com el referente. Confiar en este encabezado puede ser
+    peligroso ya que puede manipularse fácilmente, lo que tiene consecuencias no deseadas.
+
+    Accept	Accept: */*
+    Los Accept el encabezado describe qué tipos de medios puede entender el cliente. Puede contener
+    múltiples tipos de medios separados por comas. los */* El valor significa que todos los tipos de
+    medios son aceptados.
+    
+    Cookie	Cookie: PHPSESSID=b4e4fbd93540
+    Contiene pares de valores de cookies en el formato name=value. A galleta es un dato almacenado en el
+    lado del cliente y en el servidor, que actúa como un identificador. Estos se pasan al servidor por
+    solicitud, manteniendo así el acceso del cliente. Las cookies también pueden servir para otros fines,
+    como guardar las preferencias del usuario o el seguimiento de la sesión. Puede haber múltiples
+    cookies en un solo encabezado separadas por un punto y coma.
+
+    Authorization	Authorization: BASIC cGFzc3dvcmQK
+    Otro método para que el servidor identifique clientes. Después de una autenticación exitosa, el
+    servidor devuelve un token exclusivo del cliente. A diferencia de las cookies, los tokens se
+    almacenan solo en el lado del cliente y el servidor los recupera por solicitud. Existen múltiples
+    tipos de tipos de autenticación basados en el servidor web y el tipo de aplicación utilizado.
+  ~~~
+  #
+
+  #Response Headers
+  puede ser used in an HTTP 'response and do not relate to the content'. Ciertos encabezados de respuesta
+  como Age, Location, y Server se utilizan para proporcionar más contexto sobre la respuesta. Los
+  siguientes encabezados se ven comúnmente en las respuestas HTTP.
+
+  ~~~
+    Server	Server: Apache/2.2.14 (Win32)
+    Contiene información sobre el servidor HTTP, que procesó la solicitud. Se puede usar para obtener
+    información sobre el servidor, como su versión, y enumerarlo más a fondo.
+
+    Set-Cookie	Set-Cookie: PHPSESSID=b4e4fbd93540
+    Contiene las cookies necesarias para la identificación del cliente. Los navegadores analizan las
+    cookies y las almacenan para futuras solicitudes. Este encabezado sigue el mismo formato que el
+    Cookie solicitar encabezado.
+
+    WWW-Authenticate	WWW-Authenticate: BASIC realm="localhost"
+    Notifica al cliente sobre el tipo de autenticación requerida para acceder al recurso solicitado.
+  ~~~
+  #
+
+  #Security Headers
+  Con el aumento en la variedad de navegadores y ataques basados en la web, definiendo ciertos
+  encabezados que era necesaria una mayor seguridad. Los encabezados de seguridad HTTP son a class of
+  response headers used to specify certain rules and policies a seguir por el navegador mientras accede al
+  sitio web.
+
+  ~~~
+    Content-Security-Policy	Content-Security-Policy: script-src 'self'
+    Dicta la política del sitio web hacia los recursos inyectados externamente. Este podría ser el código
+    JavaScript, así como los recursos de script. Este encabezado le indica al navegador que acepte
+    recursos solo de ciertos dominios confiables, evitando así ataques como Scripting entre sitios ( XSS ).
+
+    Strict-Transport-Security	Strict-Transport-Security: max-age=31536000
+    Evita que el navegador acceda al sitio web a través del protocolo HTTP de texto sin formato y obliga
+    a que toda la comunicación se transfiera a través del protocolo seguro HTTPS. Esto evita que los
+    atacantes detecten tráfico web y accedan a información protegida, como contraseñas u otros datos
+    confidenciales.
+
+    Referrer-Policy	Referrer-Policy: origin
+    Dicta si el navegador debe incluir el valor especificado a través del Referer cabezazo o no. Puede
+    ayudar a evitar la divulgación de URL e información confidenciales mientras navega por el sitio web.
+  ~~~
+  #
+  
+  ?Podemos usar el -I bandera para enviar una solicitud al HEAD y solo muestre los encabezados de respuesta:
+  
+  $ curl -I wwux.com
+
+
+  ?Podemos usar el -i bandera para mostrar tanto los encabezados como el cuerpo de respuesta:
+
+  $ curl -i wwux.com
+
+  ?Podemos usar el -A para establecer nuestro User-Agent:
+
+  $ curl wwux.com -A 'Mozilla/5.0'
+
+//
+
+-Métodos y códigos HTTP
+
+  #Métodos HTTP
+
+    HTTP admite múltiples métodos para acceder a un recurso. En el protocolo HTTP, varios métodos de solicitud
+    permiten al navegador enviar información, formularios o archivos al servidor. Estos métodos se utilizan,
+    entre otras cosas, para decirle al servidor cómo procesar la solicitud que enviamos y cómo responder.
+    
+    GET
+    Solicita un recurso específico. Se pueden pasar datos adicionales al servidor a través de cadenas de
+    consulta en la URL ( p. ?param=value).
+    
+    POST
+    Envía datos al servidor. Puede manejar múltiples tipos de entrada, como texto, PDF y otras formas de datos
+    binarios. Estos datos se agregan en el organismo de solicitud presente después de los encabezados. El método
+    POST se usa comúnmente al enviar información ( p. formularios / inicios de sesión ) o cargar datos en un
+    sitio web, como imágenes o documentos.
+    
+    HEAD
+    Solicita los encabezados que se devolverían si se realizara una solicitud GET al servidor. No devuelve el
+    organismo de solicitud y generalmente se hace para verificar la duración de la respuesta antes de descargar
+    los recursos.
+    
+    PUT
+    Crea nuevos recursos en el servidor. Permitir este método sin los controles adecuados puede conducir a la
+    carga de recursos maliciosos.
+    
+    DELETE
+    Elimina un recurso existente en el servidor web. Si no está debidamente asegurado, puede provocar la
+    denegación de servicio ( DoS ) al eliminar archivos críticos en el servidor web.
+    
+    OPTIONS
+    Devuelve información sobre el servidor, como los métodos aceptados por él.
+    
+    PATCH
+    Aplica modificaciones parciales al recurso en la ubicación especificada.
+
+
+  #Códigos HTTP
+
+    1xx
+    Proporciona información y no afecta el procesamiento de la solicitud.
+
+    2xx
+    Regresó cuando una solicitud tiene éxito.
+
+    3xx
+    Devuelto cuando el servidor redirige al cliente.
+
+    4xx
+    Significa solicitudes inadecuadas from the client. Por ejemplo, solicitar un recurso que no existe o solicitar
+    un formato incorrecto.
+
+    5xx
+    Regresó cuando hay algún problema with the HTTP server sí mismo.
+
+    ~~~
+      200 OK
+      Regresó con una solicitud exitosa, y el organismo de respuesta generalmente contiene el recurso solicitado.
+
+      302 Found
+      Redirige al cliente a otra URL. Por ejemplo, redirigir al usuario a su panel de control después de un
+      inicio de sesión exitoso.
+
+      400 Bad Request
+      Regresó al encontrar solicitudes malformadas, como solicitudes con terminadores de línea faltantes.
+
+      403 Forbidden
+      Significa que el cliente no tiene acceso apropiado al recurso. También se puede devolver cuando el servidor
+      detecta información maliciosa del usuario.
+      
+      404 Not Found
+      Devuelto cuando el cliente solicita un recurso que no existe en el servidor.
+
+      500 Internal Server Error
+      Devuelto cuando el servidor no puede procesar la solicitud.
+    ~~~
